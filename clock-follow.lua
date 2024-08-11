@@ -46,6 +46,17 @@ function init()
     local m = metro.init(service, 0.05, -1)
     m:start()
     G.display_strobe = m
+    
+    -- Track (and display) the state of the transport:
+    G.transport_started = false
+    
+    clock.transport.start = function ()
+        G.transport_started = true
+    end
+
+    clock.transport.stop = function ()
+        G.transport_started = false
+    end
 end
 
 -- It seems that we can't just call redraw from a metro - it
@@ -106,16 +117,26 @@ local function show_settings()
     
     screen.move(SCREEN_WIDTH / 2 + 10, 10)
     -- params:get("clock_tempo") is only integer resolution
-    screen.text("tempo " .. clock.get_tempo())
+    screen.text("tempo " .. string.format("%.2f", clock.get_tempo()))
     
     screen.move(SCREEN_WIDTH / 2 + 10, 18)
     screen.text("quantum " .. params:get("link_quantum"))
     
     local src = params:get("clock_source")
-    local names = {"internal", "midi", "link", "crow"}
-    local src_name = names[src]
+    local snames = {"internal", "midi", "link", "crow"}
+    local src_name = snames[src]
     screen.move(SCREEN_WIDTH / 2 + 10, 26)
     screen.text("src " .. src_name)
+    
+    local start_stop = params:get("link_start_stop_sync")
+    local ssnames = {"n", "y"}
+    local ss_name = ssnames[start_stop]
+    screen.move(SCREEN_WIDTH / 2 + 10, 34)
+    screen.text("strt/stp " .. ss_name)
+    
+    screen.move(SCREEN_WIDTH / 2 + 10, 42)
+    local tr_name = (G.transport_started and "y" or "n")
+    screen.text("transport " .. tr_name)
 end
 
 -- The name "redraw" is magic - it prevents screen updates when
@@ -127,7 +148,12 @@ function redraw()
     screen.stroke()     -- Needed to avoid spurious traces...?
     
     draw_disc()
-    draw_locator()
+    
+    -- Don't draw location when we're cueing, or transport stopped:
+    if clock.get_beats() >= 0 and G.transport_started then
+        draw_locator()
+    end
+    
     show_beats()
     show_settings()
     
