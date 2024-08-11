@@ -1,6 +1,9 @@
------
 -- ## clock-follow
--- simple clock follower.
+-- simple clock follower. Config
+-- from PARAMETERS > CLOCK.
+-- Make sure link start/stop on
+-- to animate the cursor.
+--
 -- Nick Rothwell, nick@cassiel.com.
 
 -- I am neurotic about pollution of the top-level environment,
@@ -12,6 +15,10 @@ G = { }
 SCREEN_HEIGHT = 64
 SCREEN_WIDTH = 128
 DISC_MARGIN = 2
+
+BRIGHT = 15
+-- Turn DIM up to 8 or so for screen shots.
+DIM = 1
 
 -- Use names rather than font numbers (assuming these are stable):
 local function get_font_numbers()
@@ -67,14 +74,34 @@ function service()
     redraw()
 end
 
+local function point_on_disc(radius, theta)
+    local p = G.disc_params
+    local x = p.x + radius * math.sin(theta)
+    local y = p.y - radius * math.cos(theta)
+    
+    return x, y
+end
+
 local function draw_disc()
     local p = G.disc_params
 
-    screen.level(1)
+    screen.level(DIM)
     screen.line_width(1)
 
     screen.circle(p.x, p.y, p.r)
     screen.stroke()
+    
+    -- Draw the ticks, according to quantum value.
+    local quantum = params:get("link_quantum")
+    
+    for i = 1, quantum do
+        local theta = math.pi * 2 * i / quantum
+        local x1, y1 = point_on_disc(p.r, theta)
+        local x2, y2 = point_on_disc(p.r - 5, theta)
+        screen.move(x1, y1)
+        screen.line(x2, y2)
+        screen.stroke()
+    end
 end
 
 local function draw_locator()
@@ -85,19 +112,18 @@ local function draw_locator()
     local theta = math.fmod(beats, quantum) * math.pi * 2 / quantum
     
     local p = G.disc_params
-    local locator_x = p.x + p.r * math.sin(theta)
-    local locator_y = p.y - p.r * math.cos(theta)
-    
-    screen.level(8)
+    local x, y = point_on_disc(p.r, theta)
+
+    screen.level(BRIGHT)
     screen.line_width(0)
 
-    screen.circle(locator_x, locator_y, 2)
+    screen.circle(x, y, 2)
     screen.fill()
     
     screen.move(p.x, p.y)
-    screen.level(1)
+    screen.level(DIM)
     screen.line_width(1)
-    screen.line(locator_x, locator_y)
+    screen.line(x, y)
     screen.stroke()
     
 end
@@ -106,14 +132,14 @@ local function show_beats()
     screen.move(SCREEN_HEIGHT / 2, SCREEN_HEIGHT / 2 + 4)
     screen.font_face(NONPROP_FONT)
     screen.font_size(12)
-    screen.level(12)
+    screen.level(BRIGHT)
     screen.text_center(string.format("%.1f", clock.get_beats()))
 end
 
 local function show_settings()
     screen.font_face(SYSTEM_FONT)
     screen.font_size(8)
-    screen.level(12)
+    screen.level(BRIGHT)
     
     screen.move(SCREEN_WIDTH / 2 + 10, 10)
     -- params:get("clock_tempo") is only integer resolution
