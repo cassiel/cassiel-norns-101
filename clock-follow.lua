@@ -24,7 +24,8 @@ DIM = 1
 local function get_font_numbers()
     local t = tab.invert(screen.font_face_names)
     
-    SYSTEM_FONT = t["04B_03__"]
+    -- System font name changed in system 240911:
+    SYSTEM_FONT = t["norns"] or t["04B_03__"]
     NONPROP_FONT = t["bmp/ctrld-fixed-10r"]
 end
 
