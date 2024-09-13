@@ -1,0 +1,12 @@
+-*- mode: org; mode: visual-line; -*-
+#+STARTUP: indent
+
+* =cassiel-norns-101=
+
+Some simple studies for Norns and Lua. So far, just the one:
+
+** =clock-follow=
+
+[[clock-follow.png]]
+
+- Experiments with Ableton Link synchronisation: a rotary time display according to link quantum.
