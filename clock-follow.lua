@@ -49,7 +49,7 @@ function init()
     
     -- We'll run a metro for asynchronous update of display,
     -- regardless of beat sync. (So it'll probably jitter slightly
-    -- against the beat, unless we're at 60, 120 or similar)
+    -- against the beat, unless we're at 60, 120 or similar.)
 
     local m = metro.init(service, 0.05, -1)
     m:start()
