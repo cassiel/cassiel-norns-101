@@ -137,33 +137,44 @@ local function show_beats()
     screen.text_center(string.format("%.1f", clock.get_beats()))
 end
 
+local function param_line(y, param, value)
+    -- Return next y for next line.
+    local width = screen.text_extents(param .. "_")     -- Tried " ", gets chopped?
+    local left = SCREEN_WIDTH / 2 + 10
+
+    screen.move(left, y)
+    screen.level(DIM)
+    screen.text(param)
+    
+    screen.move(left + width, y)
+    screen.level(BRIGHT)
+    screen.text(value)
+    
+    return y + 8
+end
+
 local function show_settings()
     screen.font_face(SYSTEM_FONT)
     screen.font_size(8)
-    screen.level(BRIGHT)
     
-    screen.move(SCREEN_WIDTH / 2 + 10, 10)
+    local y = 10
+
     -- params:get("clock_tempo") is only integer resolution
-    screen.text("tempo " .. string.format("%.2f", clock.get_tempo()))
-    
-    screen.move(SCREEN_WIDTH / 2 + 10, 18)
-    screen.text("quantum " .. params:get("link_quantum"))
+    y = param_line(y, "tempo", string.format("%.2f", clock.get_tempo()))
+    y = param_line(y, "quantum", params:get("link_quantum"))
     
     local src = params:get("clock_source")
     local snames = {"internal", "midi", "link", "crow"}
     local src_name = snames[src]
-    screen.move(SCREEN_WIDTH / 2 + 10, 26)
-    screen.text("src " .. src_name)
+    y = param_line(y, "src", src_name)
     
     local start_stop = params:get("link_start_stop_sync")
     local ssnames = {"n", "y"}
     local ss_name = ssnames[start_stop]
-    screen.move(SCREEN_WIDTH / 2 + 10, 34)
-    screen.text("strt/stp " .. ss_name)
+    y = param_line(y, "strt/stop", ss_name)
     
-    screen.move(SCREEN_WIDTH / 2 + 10, 42)
     local tr_name = (G.transport_started and "y" or "n")
-    screen.text("transport " .. tr_name)
+    y = param_line(y, "transport", tr_name)
 end
 
 -- The name "redraw" is magic - it prevents screen updates when
