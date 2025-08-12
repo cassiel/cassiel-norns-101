@@ -42,26 +42,32 @@ function service()
 end
 
 local function print_item(row, key, value)
+    local y = row * 10 + 10
     screen.font_face(SYSTEM_FONT)
     screen.level(DIM)
-    screen.move(5, row * 10)
-    screen.text(key)
+    screen.move(25, y)
+    screen.text_right(key)
     
     --screen.font_face(NONPROP_FONT)
     screen.level(BRIGHT)
-    screen.move(30, row * 10)
+    screen.move(30, y)
     screen.text(value)
 end
 
 function redraw()
     screen.font_size(8)
-    
     screen.clear()
     
     print_item(1, "start", os.date("%Y-%b-%d %X", G.start_time))
     print_item(2, "now", os.date("%Y-%b-%d %X", G.now_time))
-    print_item(3, "up", G.now_time - G.start_time)
     
+    local delta = G.now_time - G.start_time
+    local h = math.floor(delta / 3600)
+    local m = math.floor(delta / 60) % 60
+    local s = delta % 60
+    
+    print_item(3, "up", string.format("%02d:%02d:%02d", h, m, s))
+
     screen.update()
 end
 
