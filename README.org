@@ -3,7 +3,13 @@
 
 * =cassiel-norns-101=
 
-Some simple studies for Norns and Lua. So far, just the one:
+Some simple studies for Norns and Lua. So far:
+
+** =uptime=
+
+[[uptime.png]]
+
+- A simple clock and uptime display.
 
 ** =clock-follow=
 
